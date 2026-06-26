@@ -1,0 +1,1975 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tablero de Control · Gobierno del Dato · Haceb</title>
+<style>
+  /* ====== PALETA CORPORATIVA HACEB (extraída de la pieza de marca) ====== */
+  :root{
+    --ink:#014644;          /* verde profundo dominante */
+    --ink-2:#02544F;        /* panel verde */
+    --ink-3:#013B39;        /* verde más oscuro */
+    --cream:#F8F1DF;        /* crema */
+    --cream-2:#FBF6EA;
+    --lime:#A9C520;         /* lima de energía */
+    --lime-soft:#C1CF67;    /* lima suave */
+    --olive:#729430;        /* oliva */
+    --gold:#E0B83C;         /* ámbar / nota musical */
+    --red:#D14A3A;          /* alerta */
+    --ok:#A9C520;
+    --line:rgba(248,241,223,.14);
+    --txt:#F8F1DF;
+    --txt-dim:rgba(248,241,223,.62);
+    --shadow:0 10px 34px rgba(0,0,0,.30);
+    --r:18px;
+    font-synthesis:none;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    color:var(--txt);
+    background:
+      radial-gradient(1200px 600px at 85% -10%, rgba(169,197,32,.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(114,148,48,.14), transparent 55%),
+      var(--ink);
+    min-height:100vh;
+    padding:clamp(16px,3vw,40px);
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1320px;margin:0 auto}
+
+  /* ====== HEADER ====== */
+  .topline{height:4px;border-radius:4px;background:linear-gradient(90deg,var(--lime),var(--olive) 60%,rgba(248,241,223,.4));margin-bottom:22px}
+  header.head{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-end;justify-content:space-between;margin-bottom:26px}
+  .brand .eyebrow{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--lime);font-weight:700;margin-bottom:8px}
+  .brand h1{font-size:clamp(26px,4vw,42px);line-height:1.02;font-weight:800;letter-spacing:-.5px}
+  .brand h1 em{font-style:normal;color:var(--lime)}
+  .brand .sub{margin-top:10px;color:var(--txt-dim);font-size:14px;max-width:560px;line-height:1.5}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.5px;color:var(--cream)}
+  .logo .dot{width:13px;height:13px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 4px rgba(169,197,32,.2)}
+
+  /* ====== COUNTDOWN ====== */
+  .deadline{
+    background:linear-gradient(135deg,var(--ink-2),var(--ink-3));
+    border:1px solid var(--line);border-radius:var(--r);
+    padding:16px 20px;min-width:280px;box-shadow:var(--shadow);
+  }
+  .deadline .lbl{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:700}
+  .deadline .date{font-size:15px;font-weight:700;margin:4px 0 10px}
+  .clock{display:flex;gap:8px}
+  .clock .seg{background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:12px;padding:8px 10px;text-align:center;min-width:54px}
+  .clock .seg b{display:block;font-size:24px;font-weight:800;color:var(--lime);line-height:1}
+  .clock .seg span{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--txt-dim)}
+
+  /* ====== KPI STRIP ====== */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:30px}
+  .kpi{background:linear-gradient(160deg,rgba(251,246,234,.06),rgba(251,246,234,.02));border:1px solid var(--line);border-radius:var(--r);padding:18px 18px 16px;position:relative;overflow:hidden}
+  .kpi::after{content:"";position:absolute;right:-20px;top:-20px;width:70px;height:70px;border-radius:50%;background:rgba(169,197,32,.08)}
+  .kpi .v{font-size:34px;font-weight:800;line-height:1;letter-spacing:-1px}
+  .kpi .v.lime{color:var(--lime)} .kpi .v.gold{color:var(--gold)} .kpi .v.red{color:var(--red)}
+  .kpi .k{margin-top:8px;font-size:12px;color:var(--txt-dim);line-height:1.35}
+  .kpi .tag{position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:20px}
+
+  /* ====== SECTION TITLES ====== */
+  .sec-title{display:flex;align-items:center;gap:12px;margin:34px 0 16px}
+  .sec-title h2{font-size:18px;font-weight:800;letter-spacing:.5px}
+  .sec-title .rule{flex:1;height:1px;background:var(--line)}
+  .sec-title .pill{font-size:11px;color:var(--ink);background:var(--lime);font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.04em}
+
+  /* ====== BASE CARDS GRID ====== */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px}
+  .card{background:linear-gradient(165deg,rgba(251,246,234,.07),rgba(251,246,234,.02));border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+  .card .c-head{padding:18px 18px 14px;display:flex;gap:14px;align-items:flex-start;border-bottom:1px solid var(--line)}
+  .card .c-name{font-size:16px;font-weight:800;letter-spacing:.2px}
+  .card .c-meta{font-size:11px;color:var(--txt-dim);margin-top:4px}
+  .state-dot{width:11px;height:11px;border-radius:50%;margin-top:5px;flex:none}
+  .st-red{background:var(--red);box-shadow:0 0 0 4px rgba(209,74,58,.18)}
+  .st-amber{background:var(--gold);box-shadow:0 0 0 4px rgba(224,184,60,.18)}
+  .st-ok{background:var(--lime);box-shadow:0 0 0 4px rgba(169,197,32,.2)}
+
+  /* battery progress (guiño a la pieza de marca) */
+  .battery{display:flex;align-items:center;gap:10px;padding:16px 18px 6px}
+  .batt-shell{position:relative;flex:1;height:30px;border:2px solid var(--lime-soft);border-radius:8px;background:rgba(0,0,0,.22);overflow:hidden}
+  .batt-shell::after{content:"";position:absolute;right:-7px;top:50%;transform:translateY(-50%);width:5px;height:13px;background:var(--lime-soft);border-radius:0 3px 3px 0}
+  .batt-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--olive),var(--lime));transition:width 1s cubic-bezier(.2,.7,.2,1)}
+  .batt-fill.amber{background:linear-gradient(90deg,#b08a1e,var(--gold))}
+  .batt-fill.red{background:linear-gradient(90deg,#a13526,var(--red))}
+  .batt-pct{font-size:22px;font-weight:800;min-width:54px;text-align:right}
+  .batt-cap{padding:0 18px 14px;font-size:11px;color:var(--txt-dim)}
+
+  .counts{display:flex;gap:8px;padding:0 18px 16px}
+  .chip{flex:1;background:rgba(0,0,0,.2);border:1px solid var(--line);border-radius:12px;padding:8px 10px;text-align:center}
+  .chip b{display:block;font-size:18px;font-weight:800}
+  .chip.stw b{color:var(--lime-soft)} .chip.san b{color:var(--gold)}
+  .chip span{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-dim)}
+
+  /* people */
+  .people{border-top:1px solid var(--line);padding:8px 10px 12px;display:flex;flex-direction:column;gap:6px}
+  .person{background:rgba(0,0,0,.16);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .p-head{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;cursor:pointer;user-select:none}
+  .p-head:hover{background:rgba(169,197,32,.06)}
+  .role-badge{font-size:9px;font-weight:800;letter-spacing:.06em;padding:3px 7px;border-radius:6px;text-transform:uppercase;flex:none}
+  .rb-stw{background:rgba(169,197,32,.16);color:var(--lime);border:1px solid rgba(169,197,32,.4)}
+  .rb-san{background:rgba(224,184,60,.14);color:var(--gold);border:1px solid rgba(224,184,60,.4)}
+  .p-info{flex:1;min-width:0}
+  .p-name{font-size:13px;font-weight:700;line-height:1.25;word-break:break-word}
+  .p-cargo{font-size:10px;color:var(--txt-dim);line-height:1.3;margin-top:2px}
+  .p-sign{font-size:9px;font-weight:800;letter-spacing:.05em;padding:3px 7px;border-radius:20px;text-transform:uppercase;flex:none}
+  .sign-no{background:rgba(209,74,58,.16);color:#f0a298;border:1px solid rgba(209,74,58,.45)}
+  .sign-yes{background:rgba(169,197,32,.18);color:var(--lime);border:1px solid rgba(169,197,32,.5)}
+  .p-cont{font-size:14px;flex:none}
+  .caret{font-size:11px;color:var(--txt-dim);transition:transform .25s;flex:none}
+  .person.open .caret{transform:rotate(90deg)}
+
+  /* individual indicator + responsibilities (collapsible) */
+  .p-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .person.open .p-body{max-height:900px}
+  .p-body-inner{padding:0 12px 12px}
+  .p-gauge{display:flex;align-items:center;gap:10px;margin:4px 0 10px}
+  .gauge-bar{flex:1;height:7px;border-radius:6px;background:rgba(0,0,0,.3);overflow:hidden}
+  .gauge-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--olive),var(--lime))}
+  .gauge-val{font-size:11px;font-weight:800;color:var(--lime-soft);min-width:34px;text-align:right}
+  .resp-lbl{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:8px 0 6px}
+  .resp{display:flex;gap:8px;font-size:11px;line-height:1.4;margin-bottom:6px;color:rgba(248,241,223,.86)}
+  .resp .n{flex:none;width:18px;height:18px;border-radius:50%;background:rgba(169,197,32,.16);color:var(--lime);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .resp b{color:var(--cream)}
+  .shared{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+  .shared .resp .n{background:rgba(224,184,60,.16);color:var(--gold)}
+
+  /* footer de tarjeta: compartidas (ambos roles) + contexto del % */
+  .card-foot{border-top:1px solid var(--line);padding:12px 14px 14px;background:rgba(0,0,0,.12)}
+  .shared-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700}
+  .shared-toggle .car{transition:transform .25s}
+  .shared-block.open .shared-toggle .car{transform:rotate(180deg)}
+  .shared-list{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .shared-block.open .shared-list{max-height:320px;margin-top:8px}
+  .ctx-block{margin-top:12px;border-left:3px solid var(--lime);background:linear-gradient(90deg,rgba(169,197,32,.10),transparent);border-radius:0 12px 12px 0;padding:10px 12px}
+  .ctx-lbl{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--lime);font-weight:800;margin-bottom:5px}
+  .ctx-text{font-size:11.5px;line-height:1.5;color:rgba(248,241,223,.9)}
+  .ctx-text b{color:var(--lime-soft);font-weight:700}
+  .ctx-text.flag{color:#f0a298}
+
+  /* ===== barra de herramientas + modo edición ===== */
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:22px}
+  .btn{display:inline-flex;align-items:center;gap:7px;font-family:inherit;font-size:12.5px;font-weight:700;letter-spacing:.02em;cursor:pointer;border-radius:12px;padding:10px 15px;border:1px solid var(--line);background:rgba(251,246,234,.06);color:var(--cream);transition:.15s}
+  .btn:hover{background:rgba(169,197,32,.12);border-color:rgba(169,197,32,.4)}
+  .btn.primary{background:var(--lime);color:var(--ink);border-color:var(--lime)}
+  .btn.primary:hover{filter:brightness(1.06)}
+  .btn.ghost{background:transparent}
+  .toolbar .hint{font-size:11px;color:var(--txt-dim);margin-left:auto;max-width:320px;text-align:right;line-height:1.4}
+  body.editing .toolbar .hint{color:var(--lime)}
+
+  .edit-input,.edit-area,.edit-sel{font-family:inherit;color:var(--cream);background:rgba(0,0,0,.28);border:1px solid rgba(169,197,32,.35);border-radius:8px;padding:6px 9px;width:100%}
+  .edit-input:focus,.edit-area:focus,.edit-sel:focus{outline:none;border-color:var(--lime);background:rgba(0,0,0,.42)}
+  .edit-num{font-family:inherit;color:var(--lime);background:rgba(0,0,0,.3);border:1px solid var(--lime);border-radius:8px;padding:4px 6px;width:70px;text-align:right;font-weight:800;font-size:20px}
+  .edit-num:focus{outline:none;background:rgba(0,0,0,.45)}
+  .edit-area{font-size:11.5px;line-height:1.5;resize:vertical;min-height:84px}
+  .edit-sel{width:auto;font-weight:700;font-size:11px;padding:5px 8px}
+  .c-name-edit{font-size:15px;font-weight:800}
+  .edit-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:7px 0}
+  .edit-row label{font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--txt-dim);display:flex;align-items:center;gap:6px;cursor:pointer}
+  .edit-row input[type=checkbox]{accent-color:var(--lime);width:16px;height:16px;cursor:pointer}
+  .editing-person{padding:11px 12px}
+  .mini-btn{font-family:inherit;font-size:10px;font-weight:700;border-radius:8px;padding:6px 10px;cursor:pointer;border:1px solid var(--line);background:rgba(251,246,234,.05);color:var(--cream)}
+  .mini-btn.del{border-color:rgba(209,74,58,.45);color:#f0a298}
+  .mini-btn.del:hover{background:rgba(209,74,58,.16)}
+  .mini-btn.add{border-color:rgba(169,197,32,.4);color:var(--lime)}
+  .mini-btn.add:hover{background:rgba(169,197,32,.14)}
+  .foot-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .add-card{display:flex!important;align-items:center;justify-content:center;border-style:dashed!important;min-height:140px;cursor:pointer;color:var(--lime);font-weight:800;font-size:14px}
+  .add-card:hover{background:rgba(169,197,32,.07)}
+  .edit-only{display:none}
+  body.editing .edit-only{display:block}
+  body.editing .view-only{display:none}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink-2);border:1px solid var(--lime);color:var(--cream);padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.3s;z-index:80;max-width:min(90vw,460px);text-align:center;line-height:1.4}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* legend */
+  .legend{display:flex;flex-wrap:wrap;gap:18px;margin:18px 0 4px;font-size:12px;color:var(--txt-dim)}
+  .legend span{display:flex;align-items:center;gap:7px}
+  .lg-dot{width:10px;height:10px;border-radius:50%}
+
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:11px;color:var(--txt-dim);display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center}
+  footer .lime{color:var(--lime);font-weight:700}
+
+  @media (max-width:560px){
+    .clock .seg{min-width:46px}
+    .brand h1{font-size:26px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body class="">
+<div class="wrap">
+
+  <div class="topline"></div>
+
+  <header class="head">
+    <div class="brand">
+      <div class="eyebrow">Comité de Gobierno del Dato · Industrias Haceb</div>
+      <h1>Tablero de Control<br><em>Monitoreo Embajador y Saneador del Dato</em></h1>
+      <p class="sub">Seguimiento de responsabilidades del Embajador del Dato y Saneador Híbrido por base de datos y por persona. Marco DAMA-DMBOK · Ley 1581 de 2012 · ISO/IEC 27001.</p>
+    </div>
+    <div class="deadline">
+      <div class="lbl">⚑ Plazo de firma</div>
+      <div class="date">Miércoles 16 de julio de 2026</div>
+      <div class="clock" id="clock">
+        <div class="seg"><b id="dd">20</b><span>Días</span></div>
+        <div class="seg"><b id="hh">12</b><span>Horas</span></div>
+        <div class="seg"><b id="mm">04</b><span>Min</span></div>
+        <div class="seg"><b id="ss">56</b><span>Seg</span></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- barra de herramientas -->
+  <div class="toolbar">
+    <button class="btn primary" id="btnEdit" onclick="toggleEdit()">✏️ Editar tablero</button>
+    <button class="btn" onclick="exportHTML()">⬇️ Exportar HTML actualizado</button>
+    <button class="btn ghost" onclick="exportJSON()">{ } Exportar datos (JSON)</button>
+    <span class="hint" id="editHint">Vista de solo lectura · pulsa «Editar tablero» para modificar cualquier campo.</span>
+  </div>
+
+  <!-- KPIs -->
+  <section class="kpis" id="kpis">
+    <div class="kpi">
+      <span class="tag" style="background:rgba(209,74,58,.18);color:#f0a298;border:1px solid rgba(209,74,58,.4)">Meta 100%</span>
+      <div class="v red">0%</div>
+      <div class="k">Firmas confirmadas del Acta</div>
+    </div>
+    <div class="kpi">
+      
+      <div class="v ">26</div>
+      <div class="k">Personas en el programa</div>
+    </div>
+    <div class="kpi">
+      
+      <div class="v lime">17</div>
+      <div class="k">Embajadores del Dato (Steward)</div>
+    </div>
+    <div class="kpi">
+      
+      <div class="v gold">9</div>
+      <div class="k">Saneadores Híbridos</div>
+    </div>
+    <div class="kpi">
+      
+      <div class="v ">11</div>
+      <div class="k">Bases de datos activas</div>
+    </div>
+    <div class="kpi">
+      
+      <div class="v gold">45%</div>
+      <div class="k">Avance promedio del dominio</div>
+    </div>
+    <div class="kpi">
+      
+      <div class="v red">11</div>
+      <div class="k">Bases sin ninguna firma</div>
+    </div>
+    <div class="kpi">
+      
+      <div class="v lime">100%</div>
+      <div class="k">Confirman continuidad en el rol</div>
+    </div></section>
+
+  <div class="legend">
+    <span><i class="lg-dot" style="background:var(--lime)"></i> Embajador del Dato (Steward) — gobierna, valida y aprueba</span>
+    <span><i class="lg-dot" style="background:var(--gold)"></i> Saneador Híbrido — ejecuta, corrige y documenta</span>
+    <span><i class="lg-dot st-red" style="margin:0"></i> Crítico</span>
+    <span><i class="lg-dot st-amber" style="margin:0"></i> En gestión</span>
+    <span><i class="lg-dot st-ok" style="margin:0"></i> Avanzado</span>
+  </div>
+
+  <div class="sec-title">
+    <h2>Estado por base de datos</h2>
+    <div class="rule"></div>
+    <div class="pill" id="basesCount">11 bases</div>
+  </div>
+
+  <section class="grid" id="grid">
+    <article class="card">
+      <div class="c-head">
+        <span class="state-dot st-red" id="dot-0"></span>
+        <div style="flex:1">
+          <div class="c-name">Hogar Haceb</div>
+          <div class="c-meta" id="meta-0">2 persona(s) · 0/2 firmadas · Crítico</div>
+        </div>
+      </div>
+      <div class="battery">
+        <div class="batt-shell"><div class="batt-fill red" id="bf-0" style="width:20%"></div></div>
+        <div class="batt-pct" id="pct-0">20%</div>
+      </div>
+      <div class="batt-cap">Avance / calidad del dominio</div>
+      <div class="counts">
+        <div class="chip stw"><b>1</b><span>Stewards</span></div>
+        <div class="chip san"><b>1</b><span>Saneadores</span></div>
+        <div class="chip"><b>0</b><span>Firmaron</span></div>
+      </div>
+      <div class="people">
+    <div class="person" id="p-0-0">
+      <div class="p-head" onclick="togglePerson('p-0-0')">
+        <span class="role-badge rb-stw">Steward</span>
+        <div class="p-info">
+          <div class="p-name">Santiago Marulanda Marín</div>
+          <div class="p-cargo">Analista Relacionamiento Consumidor Marca</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:26%"></div></div>
+          <span class="gauge-val">26%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Alerta y Monitoreo.</b> Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Validación de Reglas.</b> Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Aprobación de Cambios.</b> Último filtro de negocio: aprueba a producción solo lo validado técnicamente.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Reporte y Gobernanza.</b> Reporta métricas mensuales de calidad al Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento y Protección.</b> Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div>
+    <div class="person" id="p-0-1">
+      <div class="p-head" onclick="togglePerson('p-0-1')">
+        <span class="role-badge rb-san">Saneador</span>
+        <div class="p-info">
+          <div class="p-name">Lady Johanna Hernández Agudelo</div>
+          <div class="p-cargo">Asesor Apoyo Gestión Experiencia</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:26%"></div></div>
+          <span class="gauge-val">26%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Intervención Técnica.</b> Ejecuta correcciones sobre registros incorrectos, vacíos o duplicados según reglas aprobadas.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Documentación Rigurosa.</b> Mantiene bitácora de cada cambio: fecha, regla, justificación, registros y autor.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Validación Temprana.</b> Prueba las correcciones en preproducción antes de moverlas a producción.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Trazabilidad y Auditoría.</b> Garantiza que toda intervención sea trazable y auditable.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento Normativo.</b> Respeta permisos de acceso y cumple Ley 1581 e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div></div>
+      <div class="card-foot">
+        
+    <div class="shared-block" id="sh-0">
+      <div class="shared-toggle" onclick="toggleShared('sh-0')">
+        <span>Responsabilidades compartidas (ambos roles)</span><span class="car">▾</span>
+      </div>
+      <div class="shared-list">
+    <div class="resp"><span class="n">·</span><span>Proteger la integridad y confidencialidad de los datos (Ley 1581 / ISO 27001).</span></div>
+    <div class="resp"><span class="n">·</span><span>Colaborar de forma activa y oportuna para resolver issues de calidad.</span></div>
+    <div class="resp"><span class="n">·</span><span>Participar en el seguimiento mensual del Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">·</span><span>Mantener actualizado el registro de cambios y alertas del dominio.</span></div></div>
+    </div>
+        <div class="ctx-block">
+          <div class="ctx-lbl">¿Por qué este %? · Contexto del dominio</div>
+          <p class="ctx-text">Se encuentra pendiente un soporte relacionado con CDC que permita corregir la información de Habeas Data. A través de este sistema, el consentimiento de las personas que respondieron <b>“Sí”</b> fue registrado erróneamente como <b>“No”</b>, situación que debe ser ajustada mediante dicho soporte. Los demás temas de calidad, la saneadora hace cargues manuales.</p>
+        </div>
+        
+      </div>
+    </article>
+    <article class="card">
+      <div class="c-head">
+        <span class="state-dot st-amber" id="dot-1"></span>
+        <div style="flex:1">
+          <div class="c-name">CRM (BigQuery)</div>
+          <div class="c-meta" id="meta-1">2 persona(s) · 0/2 firmadas · En gestión</div>
+        </div>
+      </div>
+      <div class="battery">
+        <div class="batt-shell"><div class="batt-fill amber" id="bf-1" style="width:58%"></div></div>
+        <div class="batt-pct" id="pct-1">58%</div>
+      </div>
+      <div class="batt-cap">Avance / calidad del dominio</div>
+      <div class="counts">
+        <div class="chip stw"><b>1</b><span>Stewards</span></div>
+        <div class="chip san"><b>1</b><span>Saneadores</span></div>
+        <div class="chip"><b>0</b><span>Firmaron</span></div>
+      </div>
+      <div class="people">
+    <div class="person" id="p-1-0">
+      <div class="p-head" onclick="togglePerson('p-1-0')">
+        <span class="role-badge rb-stw">Steward</span>
+        <div class="p-info">
+          <div class="p-name">Melissa Giraldo Castro</div>
+          <div class="p-cargo">Analista de Ecosistemas Directos</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:64%"></div></div>
+          <span class="gauge-val">64%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Alerta y Monitoreo.</b> Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Validación de Reglas.</b> Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Aprobación de Cambios.</b> Último filtro de negocio: aprueba a producción solo lo validado técnicamente.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Reporte y Gobernanza.</b> Reporta métricas mensuales de calidad al Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento y Protección.</b> Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div>
+    <div class="person" id="p-1-1">
+      <div class="p-head" onclick="togglePerson('p-1-1')">
+        <span class="role-badge rb-san">Saneador</span>
+        <div class="p-info">
+          <div class="p-name">Luis Fernando Zapata</div>
+          <div class="p-cargo">Arquitecto de Aplicaciones y Datos</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:64%"></div></div>
+          <span class="gauge-val">64%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Intervención Técnica.</b> Ejecuta correcciones sobre registros incorrectos, vacíos o duplicados según reglas aprobadas.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Documentación Rigurosa.</b> Mantiene bitácora de cada cambio: fecha, regla, justificación, registros y autor.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Validación Temprana.</b> Prueba las correcciones en preproducción antes de moverlas a producción.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Trazabilidad y Auditoría.</b> Garantiza que toda intervención sea trazable y auditable.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento Normativo.</b> Respeta permisos de acceso y cumple Ley 1581 e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div></div>
+      <div class="card-foot">
+        
+    <div class="shared-block" id="sh-1">
+      <div class="shared-toggle" onclick="toggleShared('sh-1')">
+        <span>Responsabilidades compartidas (ambos roles)</span><span class="car">▾</span>
+      </div>
+      <div class="shared-list">
+    <div class="resp"><span class="n">·</span><span>Proteger la integridad y confidencialidad de los datos (Ley 1581 / ISO 27001).</span></div>
+    <div class="resp"><span class="n">·</span><span>Colaborar de forma activa y oportuna para resolver issues de calidad.</span></div>
+    <div class="resp"><span class="n">·</span><span>Participar en el seguimiento mensual del Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">·</span><span>Mantener actualizado el registro de cambios y alertas del dominio.</span></div></div>
+    </div>
+        <div class="ctx-block">
+          <div class="ctx-lbl">¿Por qué este %? · Contexto del dominio</div>
+          <p class="ctx-text">El indicador de calidad del dominio pasó del <b>54% al 58%</b>, gracias a la implementación de reglas básicas de calidad de datos en BigQuery y al fortalecimiento de los controles sobre la información.</p>
+        </div>
+        
+      </div>
+    </article>
+    <article class="card">
+      <div class="c-head">
+        <span class="state-dot st-amber" id="dot-2"></span>
+        <div style="flex:1">
+          <div class="c-name">Crédito Haceb</div>
+          <div class="c-meta" id="meta-2">3 persona(s) · 0/3 firmadas · En gestión</div>
+        </div>
+      </div>
+      <div class="battery">
+        <div class="batt-shell"><div class="batt-fill amber" id="bf-2" style="width:40%"></div></div>
+        <div class="batt-pct" id="pct-2">40%</div>
+      </div>
+      <div class="batt-cap">Avance / calidad del dominio</div>
+      <div class="counts">
+        <div class="chip stw"><b>1</b><span>Stewards</span></div>
+        <div class="chip san"><b>2</b><span>Saneadores</span></div>
+        <div class="chip"><b>0</b><span>Firmaron</span></div>
+      </div>
+      <div class="people">
+    <div class="person" id="p-2-0">
+      <div class="p-head" onclick="togglePerson('p-2-0')">
+        <span class="role-badge rb-stw">Steward</span>
+        <div class="p-info">
+          <div class="p-name">Nelcy Mestizo</div>
+          <div class="p-cargo">Líder Financiero Retail</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:46%"></div></div>
+          <span class="gauge-val">46%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Alerta y Monitoreo.</b> Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Validación de Reglas.</b> Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Aprobación de Cambios.</b> Último filtro de negocio: aprueba a producción solo lo validado técnicamente.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Reporte y Gobernanza.</b> Reporta métricas mensuales de calidad al Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento y Protección.</b> Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div>
+    <div class="person" id="p-2-1">
+      <div class="p-head" onclick="togglePerson('p-2-1')">
+        <span class="role-badge rb-san">Saneador</span>
+        <div class="p-info">
+          <div class="p-name">Manuel Zuleta</div>
+          <div class="p-cargo">Científico de Datos</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:46%"></div></div>
+          <span class="gauge-val">46%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Intervención Técnica.</b> Ejecuta correcciones sobre registros incorrectos, vacíos o duplicados según reglas aprobadas.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Documentación Rigurosa.</b> Mantiene bitácora de cada cambio: fecha, regla, justificación, registros y autor.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Validación Temprana.</b> Prueba las correcciones en preproducción antes de moverlas a producción.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Trazabilidad y Auditoría.</b> Garantiza que toda intervención sea trazable y auditable.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento Normativo.</b> Respeta permisos de acceso y cumple Ley 1581 e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div>
+    <div class="person" id="p-2-2">
+      <div class="p-head" onclick="togglePerson('p-2-2')">
+        <span class="role-badge rb-san">Saneador</span>
+        <div class="p-info">
+          <div class="p-name">Melissa Andrea Mena</div>
+          <div class="p-cargo">Administrador Crédito</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:46%"></div></div>
+          <span class="gauge-val">46%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Intervención Técnica.</b> Ejecuta correcciones sobre registros incorrectos, vacíos o duplicados según reglas aprobadas.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Documentación Rigurosa.</b> Mantiene bitácora de cada cambio: fecha, regla, justificación, registros y autor.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Validación Temprana.</b> Prueba las correcciones en preproducción antes de moverlas a producción.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Trazabilidad y Auditoría.</b> Garantiza que toda intervención sea trazable y auditable.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento Normativo.</b> Respeta permisos de acceso y cumple Ley 1581 e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div></div>
+      <div class="card-foot">
+        
+    <div class="shared-block" id="sh-2">
+      <div class="shared-toggle" onclick="toggleShared('sh-2')">
+        <span>Responsabilidades compartidas (ambos roles)</span><span class="car">▾</span>
+      </div>
+      <div class="shared-list">
+    <div class="resp"><span class="n">·</span><span>Proteger la integridad y confidencialidad de los datos (Ley 1581 / ISO 27001).</span></div>
+    <div class="resp"><span class="n">·</span><span>Colaborar de forma activa y oportuna para resolver issues de calidad.</span></div>
+    <div class="resp"><span class="n">·</span><span>Participar en el seguimiento mensual del Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">·</span><span>Mantener actualizado el registro de cambios y alertas del dominio.</span></div></div>
+    </div>
+        <div class="ctx-block">
+          <div class="ctx-lbl">¿Por qué este %? · Contexto del dominio</div>
+          <p class="ctx-text">La información oficial se encuentra en el CDC; sin embargo, actualmente se está tomando desde OnCredit mientras se integra la fuente al tablero de Datos Habilitados. Se trabaja con el Científico de Datos en esta incorporación y se cuenta con aproximadamente <b>83.000 registros</b> con control de Habeas Data (Sí/No).</p>
+        </div>
+        
+      </div>
+    </article>
+    <article class="card">
+      <div class="c-head">
+        <span class="state-dot st-amber" id="dot-3"></span>
+        <div style="flex:1">
+          <div class="c-name">Clientes SAP</div>
+          <div class="c-meta" id="meta-3">3 persona(s) · 0/3 firmadas · En gestión</div>
+        </div>
+      </div>
+      <div class="battery">
+        <div class="batt-shell"><div class="batt-fill amber" id="bf-3" style="width:30%"></div></div>
+        <div class="batt-pct" id="pct-3">30%</div>
+      </div>
+      <div class="batt-cap">Avance / calidad del dominio</div>
+      <div class="counts">
+        <div class="chip stw"><b>1</b><span>Stewards</span></div>
+        <div class="chip san"><b>2</b><span>Saneadores</span></div>
+        <div class="chip"><b>0</b><span>Firmaron</span></div>
+      </div>
+      <div class="people">
+    <div class="person" id="p-3-0">
+      <div class="p-head" onclick="togglePerson('p-3-0')">
+        <span class="role-badge rb-stw">Steward</span>
+        <div class="p-info">
+          <div class="p-name">María Natalia Cuartas Escobar</div>
+          <div class="p-cargo">Coordinador Administrativo de Ventas</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:36%"></div></div>
+          <span class="gauge-val">36%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Alerta y Monitoreo.</b> Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Validación de Reglas.</b> Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Aprobación de Cambios.</b> Último filtro de negocio: aprueba a producción solo lo validado técnicamente.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Reporte y Gobernanza.</b> Reporta métricas mensuales de calidad al Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento y Protección.</b> Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div>
+    <div class="person" id="p-3-1">
+      <div class="p-head" onclick="togglePerson('p-3-1')">
+        <span class="role-badge rb-san">Saneador</span>
+        <div class="p-info">
+          <div class="p-name">Belquis Andrea Rúa</div>
+          <div class="p-cargo">Auxiliar Administrativo de Ventas</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:36%"></div></div>
+          <span class="gauge-val">36%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Intervención Técnica.</b> Ejecuta correcciones sobre registros incorrectos, vacíos o duplicados según reglas aprobadas.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Documentación Rigurosa.</b> Mantiene bitácora de cada cambio: fecha, regla, justificación, registros y autor.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Validación Temprana.</b> Prueba las correcciones en preproducción antes de moverlas a producción.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Trazabilidad y Auditoría.</b> Garantiza que toda intervención sea trazable y auditable.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento Normativo.</b> Respeta permisos de acceso y cumple Ley 1581 e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div>
+    <div class="person" id="p-3-2">
+      <div class="p-head" onclick="togglePerson('p-3-2')">
+        <span class="role-badge rb-san">Saneador</span>
+        <div class="p-info">
+          <div class="p-name">Tatiana Herrera</div>
+          <div class="p-cargo">Auxiliar Administrativo de Ventas</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:36%"></div></div>
+          <span class="gauge-val">36%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Intervención Técnica.</b> Ejecuta correcciones sobre registros incorrectos, vacíos o duplicados según reglas aprobadas.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Documentación Rigurosa.</b> Mantiene bitácora de cada cambio: fecha, regla, justificación, registros y autor.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Validación Temprana.</b> Prueba las correcciones en preproducción antes de moverlas a producción.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Trazabilidad y Auditoría.</b> Garantiza que toda intervención sea trazable y auditable.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento Normativo.</b> Respeta permisos de acceso y cumple Ley 1581 e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div></div>
+      <div class="card-foot">
+        
+    <div class="shared-block" id="sh-3">
+      <div class="shared-toggle" onclick="toggleShared('sh-3')">
+        <span>Responsabilidades compartidas (ambos roles)</span><span class="car">▾</span>
+      </div>
+      <div class="shared-list">
+    <div class="resp"><span class="n">·</span><span>Proteger la integridad y confidencialidad de los datos (Ley 1581 / ISO 27001).</span></div>
+    <div class="resp"><span class="n">·</span><span>Colaborar de forma activa y oportuna para resolver issues de calidad.</span></div>
+    <div class="resp"><span class="n">·</span><span>Participar en el seguimiento mensual del Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">·</span><span>Mantener actualizado el registro de cambios y alertas del dominio.</span></div></div>
+    </div>
+        <div class="ctx-block">
+          <div class="ctx-lbl">¿Por qué este %? · Contexto del dominio</div>
+          <p class="ctx-text">Pendiente el bloqueo de transacciones con Carolina Morales. Se continúa trabajando en la calidad y gestión de la información del dominio.</p>
+        </div>
+        
+      </div>
+    </article>
+    <article class="card">
+      <div class="c-head">
+        <span class="state-dot st-red" id="dot-4"></span>
+        <div style="flex:1">
+          <div class="c-name">ZPOS</div>
+          <div class="c-meta" id="meta-4">4 persona(s) · 0/4 firmadas · Crítico</div>
+        </div>
+      </div>
+      <div class="battery">
+        <div class="batt-shell"><div class="batt-fill red" id="bf-4" style="width:16%"></div></div>
+        <div class="batt-pct" id="pct-4">16%</div>
+      </div>
+      <div class="batt-cap">Avance / calidad del dominio</div>
+      <div class="counts">
+        <div class="chip stw"><b>3</b><span>Stewards</span></div>
+        <div class="chip san"><b>1</b><span>Saneadores</span></div>
+        <div class="chip"><b>0</b><span>Firmaron</span></div>
+      </div>
+      <div class="people">
+    <div class="person" id="p-4-0">
+      <div class="p-head" onclick="togglePerson('p-4-0')">
+        <span class="role-badge rb-stw">Steward</span>
+        <div class="p-info">
+          <div class="p-name">Rubén Darío Montoya Tamayo</div>
+          <div class="p-cargo">Jefe Comercial Retail · Back Retail</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:22%"></div></div>
+          <span class="gauge-val">22%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Alerta y Monitoreo.</b> Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Validación de Reglas.</b> Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Aprobación de Cambios.</b> Último filtro de negocio: aprueba a producción solo lo validado técnicamente.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Reporte y Gobernanza.</b> Reporta métricas mensuales de calidad al Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento y Protección.</b> Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div>
+    <div class="person" id="p-4-1">
+      <div class="p-head" onclick="togglePerson('p-4-1')">
+        <span class="role-badge rb-stw">Steward</span>
+        <div class="p-info">
+          <div class="p-name">Andrea Catalina Colorado Marín</div>
+          <div class="p-cargo">Coordinador Retail</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:22%"></div></div>
+          <span class="gauge-val">22%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Alerta y Monitoreo.</b> Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Validación de Reglas.</b> Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Aprobación de Cambios.</b> Último filtro de negocio: aprueba a producción solo lo validado técnicamente.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Reporte y Gobernanza.</b> Reporta métricas mensuales de calidad al Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento y Protección.</b> Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div>
+    <div class="person" id="p-4-2">
+      <div class="p-head" onclick="togglePerson('p-4-2')">
+        <span class="role-badge rb-stw">Steward</span>
+        <div class="p-info">
+          <div class="p-name">Anyela Tatiana Quintero Ocampo</div>
+          <div class="p-cargo">Gestor Control Retail</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:22%"></div></div>
+          <span class="gauge-val">22%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Alerta y Monitoreo.</b> Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Validación de Reglas.</b> Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Aprobación de Cambios.</b> Último filtro de negocio: aprueba a producción solo lo validado técnicamente.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Reporte y Gobernanza.</b> Reporta métricas mensuales de calidad al Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento y Protección.</b> Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div>
+    <div class="person" id="p-4-3">
+      <div class="p-head" onclick="togglePerson('p-4-3')">
+        <span class="role-badge rb-san">Saneador</span>
+        <div class="p-info">
+          <div class="p-name">Carolina Morales</div>
+          <div class="p-cargo">Auxiliar Control Retail</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:22%"></div></div>
+          <span class="gauge-val">22%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Intervención Técnica.</b> Ejecuta correcciones sobre registros incorrectos, vacíos o duplicados según reglas aprobadas.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Documentación Rigurosa.</b> Mantiene bitácora de cada cambio: fecha, regla, justificación, registros y autor.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Validación Temprana.</b> Prueba las correcciones en preproducción antes de moverlas a producción.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Trazabilidad y Auditoría.</b> Garantiza que toda intervención sea trazable y auditable.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento Normativo.</b> Respeta permisos de acceso y cumple Ley 1581 e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div></div>
+      <div class="card-foot">
+        
+    <div class="shared-block" id="sh-4">
+      <div class="shared-toggle" onclick="toggleShared('sh-4')">
+        <span>Responsabilidades compartidas (ambos roles)</span><span class="car">▾</span>
+      </div>
+      <div class="shared-list">
+    <div class="resp"><span class="n">·</span><span>Proteger la integridad y confidencialidad de los datos (Ley 1581 / ISO 27001).</span></div>
+    <div class="resp"><span class="n">·</span><span>Colaborar de forma activa y oportuna para resolver issues de calidad.</span></div>
+    <div class="resp"><span class="n">·</span><span>Participar en el seguimiento mensual del Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">·</span><span>Mantener actualizado el registro de cambios y alertas del dominio.</span></div></div>
+    </div>
+        <div class="ctx-block">
+          <div class="ctx-lbl">¿Por qué este %? · Contexto del dominio</div>
+          <p class="ctx-text">Avance correspondiente a la implementación de las reglas básicas de calidad de datos definidas para el dominio en BigQuery.</p>
+        </div>
+        
+      </div>
+    </article>
+    <article class="card">
+      <div class="c-head">
+        <span class="state-dot st-amber" id="dot-5"></span>
+        <div style="flex:1">
+          <div class="c-name">WhatsApp</div>
+          <div class="c-meta" id="meta-5">1 persona(s) · 0/1 firmadas · En gestión</div>
+        </div>
+      </div>
+      <div class="battery">
+        <div class="batt-shell"><div class="batt-fill amber" id="bf-5" style="width:50%"></div></div>
+        <div class="batt-pct" id="pct-5">50%</div>
+      </div>
+      <div class="batt-cap">Avance / calidad del dominio</div>
+      <div class="counts">
+        <div class="chip stw"><b>1</b><span>Stewards</span></div>
+        <div class="chip san"><b>0</b><span>Saneadores</span></div>
+        <div class="chip"><b>0</b><span>Firmaron</span></div>
+      </div>
+      <div class="people">
+    <div class="person" id="p-5-0">
+      <div class="p-head" onclick="togglePerson('p-5-0')">
+        <span class="role-badge rb-stw">Steward</span>
+        <div class="p-info">
+          <div class="p-name">Joseph Manuel Muñoz Galvis</div>
+          <div class="p-cargo">Auxiliar Escucha Gestión Experiencia</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:56%"></div></div>
+          <span class="gauge-val">56%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Alerta y Monitoreo.</b> Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Validación de Reglas.</b> Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Aprobación de Cambios.</b> Último filtro de negocio: aprueba a producción solo lo validado técnicamente.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Reporte y Gobernanza.</b> Reporta métricas mensuales de calidad al Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento y Protección.</b> Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div></div>
+      <div class="card-foot">
+        
+    <div class="shared-block" id="sh-5">
+      <div class="shared-toggle" onclick="toggleShared('sh-5')">
+        <span>Responsabilidades compartidas (ambos roles)</span><span class="car">▾</span>
+      </div>
+      <div class="shared-list">
+    <div class="resp"><span class="n">·</span><span>Proteger la integridad y confidencialidad de los datos (Ley 1581 / ISO 27001).</span></div>
+    <div class="resp"><span class="n">·</span><span>Colaborar de forma activa y oportuna para resolver issues de calidad.</span></div>
+    <div class="resp"><span class="n">·</span><span>Participar en el seguimiento mensual del Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">·</span><span>Mantener actualizado el registro de cambios y alertas del dominio.</span></div></div>
+    </div>
+        <div class="ctx-block">
+          <div class="ctx-lbl">¿Por qué este %? · Contexto del dominio</div>
+          <p class="ctx-text">Información dinámica que requiere seguimiento y validación frecuente.</p>
+        </div>
+        
+      </div>
+    </article>
+    <article class="card">
+      <div class="c-head">
+        <span class="state-dot st-amber" id="dot-6"></span>
+        <div style="flex:1">
+          <div class="c-name">eCommerce y Haceb.com</div>
+          <div class="c-meta" id="meta-6">3 persona(s) · 0/3 firmadas · En gestión</div>
+        </div>
+      </div>
+      <div class="battery">
+        <div class="batt-shell"><div class="batt-fill amber" id="bf-6" style="width:40%"></div></div>
+        <div class="batt-pct" id="pct-6">40%</div>
+      </div>
+      <div class="batt-cap">Avance / calidad del dominio</div>
+      <div class="counts">
+        <div class="chip stw"><b>2</b><span>Stewards</span></div>
+        <div class="chip san"><b>1</b><span>Saneadores</span></div>
+        <div class="chip"><b>0</b><span>Firmaron</span></div>
+      </div>
+      <div class="people">
+    <div class="person" id="p-6-0">
+      <div class="p-head" onclick="togglePerson('p-6-0')">
+        <span class="role-badge rb-stw">Steward</span>
+        <div class="p-info">
+          <div class="p-name">Carolina Rodas Posada</div>
+          <div class="p-cargo">Líder Ecommerce · Canales No Presenciales</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:46%"></div></div>
+          <span class="gauge-val">46%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Alerta y Monitoreo.</b> Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Validación de Reglas.</b> Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Aprobación de Cambios.</b> Último filtro de negocio: aprueba a producción solo lo validado técnicamente.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Reporte y Gobernanza.</b> Reporta métricas mensuales de calidad al Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento y Protección.</b> Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div>
+    <div class="person" id="p-6-1">
+      <div class="p-head" onclick="togglePerson('p-6-1')">
+        <span class="role-badge rb-stw">Steward</span>
+        <div class="p-info">
+          <div class="p-name">Carlos Alberto Narváez Beltrán</div>
+          <div class="p-cargo">Especialista TI Canales Digitales UEN's</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:46%"></div></div>
+          <span class="gauge-val">46%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Alerta y Monitoreo.</b> Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Validación de Reglas.</b> Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Aprobación de Cambios.</b> Último filtro de negocio: aprueba a producción solo lo validado técnicamente.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Reporte y Gobernanza.</b> Reporta métricas mensuales de calidad al Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento y Protección.</b> Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div>
+    <div class="person" id="p-6-2">
+      <div class="p-head" onclick="togglePerson('p-6-2')">
+        <span class="role-badge rb-san">Saneador</span>
+        <div class="p-info">
+          <div class="p-name">Vallentina Álvarez Paniagua</div>
+          <div class="p-cargo">Auxiliar Ecommerce Canales Digitales</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:46%"></div></div>
+          <span class="gauge-val">46%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Intervención Técnica.</b> Ejecuta correcciones sobre registros incorrectos, vacíos o duplicados según reglas aprobadas.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Documentación Rigurosa.</b> Mantiene bitácora de cada cambio: fecha, regla, justificación, registros y autor.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Validación Temprana.</b> Prueba las correcciones en preproducción antes de moverlas a producción.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Trazabilidad y Auditoría.</b> Garantiza que toda intervención sea trazable y auditable.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento Normativo.</b> Respeta permisos de acceso y cumple Ley 1581 e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div></div>
+      <div class="card-foot">
+        
+    <div class="shared-block" id="sh-6">
+      <div class="shared-toggle" onclick="toggleShared('sh-6')">
+        <span>Responsabilidades compartidas (ambos roles)</span><span class="car">▾</span>
+      </div>
+      <div class="shared-list">
+    <div class="resp"><span class="n">·</span><span>Proteger la integridad y confidencialidad de los datos (Ley 1581 / ISO 27001).</span></div>
+    <div class="resp"><span class="n">·</span><span>Colaborar de forma activa y oportuna para resolver issues de calidad.</span></div>
+    <div class="resp"><span class="n">·</span><span>Participar en el seguimiento mensual del Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">·</span><span>Mantener actualizado el registro de cambios y alertas del dominio.</span></div></div>
+    </div>
+        <div class="ctx-block">
+          <div class="ctx-lbl">¿Por qué este %? · Contexto del dominio</div>
+          <p class="ctx-text"><b>Dominio controlado.</b> Se avanza en la depuración, validación y fortalecimiento de la calidad de la información del dominio. Está pendiente la depuración de aproximadamente <b>93.000 registros</b> de la base Aniversario Hogar, así como de otras bases activas e inactivas provenientes de VTEX, con el fin de consolidar y organizar la información. Adicionalmente, se trabaja con el equipo de Arquitectura para optimizar las integraciones y migrarlas a GCP.</p>
+        </div>
+        
+      </div>
+    </article>
+    <article class="card">
+      <div class="c-head">
+        <span class="state-dot st-ok" id="dot-7"></span>
+        <div style="flex:1">
+          <div class="c-name">TI / TD</div>
+          <div class="c-meta" id="meta-7">3 persona(s) · 0/3 firmadas · Avanzado</div>
+        </div>
+      </div>
+      <div class="battery">
+        <div class="batt-shell"><div class="batt-fill " id="bf-7" style="width:70%"></div></div>
+        <div class="batt-pct" id="pct-7">70%</div>
+      </div>
+      <div class="batt-cap">Avance / calidad del dominio</div>
+      <div class="counts">
+        <div class="chip stw"><b>3</b><span>Stewards</span></div>
+        <div class="chip san"><b>0</b><span>Saneadores</span></div>
+        <div class="chip"><b>0</b><span>Firmaron</span></div>
+      </div>
+      <div class="people">
+    <div class="person" id="p-7-0">
+      <div class="p-head" onclick="togglePerson('p-7-0')">
+        <span class="role-badge rb-stw">Steward</span>
+        <div class="p-info">
+          <div class="p-name">Diego Hernán Poveda Montenegro</div>
+          <div class="p-cargo">Científico de Datos · TD y TI</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:76%"></div></div>
+          <span class="gauge-val">76%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Alerta y Monitoreo.</b> Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Validación de Reglas.</b> Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Aprobación de Cambios.</b> Último filtro de negocio: aprueba a producción solo lo validado técnicamente.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Reporte y Gobernanza.</b> Reporta métricas mensuales de calidad al Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento y Protección.</b> Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div>
+    <div class="person" id="p-7-1">
+      <div class="p-head" onclick="togglePerson('p-7-1')">
+        <span class="role-badge rb-stw">Steward</span>
+        <div class="p-info">
+          <div class="p-name">Jorge Eliécer Mendoza Rodríguez</div>
+          <div class="p-cargo">Seguridad de la Información</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:76%"></div></div>
+          <span class="gauge-val">76%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Alerta y Monitoreo.</b> Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Validación de Reglas.</b> Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Aprobación de Cambios.</b> Último filtro de negocio: aprueba a producción solo lo validado técnicamente.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Reporte y Gobernanza.</b> Reporta métricas mensuales de calidad al Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento y Protección.</b> Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div>
+    <div class="person" id="p-7-2">
+      <div class="p-head" onclick="togglePerson('p-7-2')">
+        <span class="role-badge rb-stw">Steward</span>
+        <div class="p-info">
+          <div class="p-name">Juan Diego Castañeda Castañeda</div>
+          <div class="p-cargo">Ciberseguridad · TD y TI</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:76%"></div></div>
+          <span class="gauge-val">76%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Alerta y Monitoreo.</b> Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Validación de Reglas.</b> Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Aprobación de Cambios.</b> Último filtro de negocio: aprueba a producción solo lo validado técnicamente.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Reporte y Gobernanza.</b> Reporta métricas mensuales de calidad al Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento y Protección.</b> Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div></div>
+      <div class="card-foot">
+        
+    <div class="shared-block" id="sh-7">
+      <div class="shared-toggle" onclick="toggleShared('sh-7')">
+        <span>Responsabilidades compartidas (ambos roles)</span><span class="car">▾</span>
+      </div>
+      <div class="shared-list">
+    <div class="resp"><span class="n">·</span><span>Proteger la integridad y confidencialidad de los datos (Ley 1581 / ISO 27001).</span></div>
+    <div class="resp"><span class="n">·</span><span>Colaborar de forma activa y oportuna para resolver issues de calidad.</span></div>
+    <div class="resp"><span class="n">·</span><span>Participar en el seguimiento mensual del Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">·</span><span>Mantener actualizado el registro de cambios y alertas del dominio.</span></div></div>
+    </div>
+        <div class="ctx-block">
+          <div class="ctx-lbl">¿Por qué este %? · Contexto del dominio</div>
+          <p class="ctx-text">Dominio de alto impacto transversal con múltiples fuentes de información y controles implementados.</p>
+        </div>
+        
+      </div>
+    </article>
+    <article class="card">
+      <div class="c-head">
+        <span class="state-dot st-amber" id="dot-8"></span>
+        <div style="flex:1">
+          <div class="c-name">Field Service</div>
+          <div class="c-meta" id="meta-8">1 persona(s) · 0/1 firmadas · En gestión</div>
+        </div>
+      </div>
+      <div class="battery">
+        <div class="batt-shell"><div class="batt-fill amber" id="bf-8" style="width:58%"></div></div>
+        <div class="batt-pct" id="pct-8">58%</div>
+      </div>
+      <div class="batt-cap">Avance / calidad del dominio</div>
+      <div class="counts">
+        <div class="chip stw"><b>1</b><span>Stewards</span></div>
+        <div class="chip san"><b>0</b><span>Saneadores</span></div>
+        <div class="chip"><b>0</b><span>Firmaron</span></div>
+      </div>
+      <div class="people">
+    <div class="person" id="p-8-0">
+      <div class="p-head" onclick="togglePerson('p-8-0')">
+        <span class="role-badge rb-stw">Steward</span>
+        <div class="p-info">
+          <div class="p-name">Génesis Johana Tavera Nuño</div>
+          <div class="p-cargo">Coordinador Ingeniería de Servicio Back</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:64%"></div></div>
+          <span class="gauge-val">64%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Alerta y Monitoreo.</b> Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Validación de Reglas.</b> Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Aprobación de Cambios.</b> Último filtro de negocio: aprueba a producción solo lo validado técnicamente.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Reporte y Gobernanza.</b> Reporta métricas mensuales de calidad al Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento y Protección.</b> Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div></div>
+      <div class="card-foot">
+        
+    <div class="shared-block" id="sh-8">
+      <div class="shared-toggle" onclick="toggleShared('sh-8')">
+        <span>Responsabilidades compartidas (ambos roles)</span><span class="car">▾</span>
+      </div>
+      <div class="shared-list">
+    <div class="resp"><span class="n">·</span><span>Proteger la integridad y confidencialidad de los datos (Ley 1581 / ISO 27001).</span></div>
+    <div class="resp"><span class="n">·</span><span>Colaborar de forma activa y oportuna para resolver issues de calidad.</span></div>
+    <div class="resp"><span class="n">·</span><span>Participar en el seguimiento mensual del Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">·</span><span>Mantener actualizado el registro de cambios y alertas del dominio.</span></div></div>
+    </div>
+        <div class="ctx-block">
+          <div class="ctx-lbl">¿Por qué este %? · Contexto del dominio</div>
+          <p class="ctx-text">Hace parte del dominio de CRM, por lo que comparte el mismo indicador de calidad de datos y las mismas reglas de calidad implementadas.</p>
+        </div>
+        
+      </div>
+    </article>
+    <article class="card">
+      <div class="c-head">
+        <span class="state-dot st-ok" id="dot-9"></span>
+        <div style="flex:1">
+          <div class="c-name">Contact Center</div>
+          <div class="c-meta" id="meta-9">2 persona(s) · 0/2 firmadas · Avanzado</div>
+        </div>
+      </div>
+      <div class="battery">
+        <div class="batt-shell"><div class="batt-fill " id="bf-9" style="width:60%"></div></div>
+        <div class="batt-pct" id="pct-9">60%</div>
+      </div>
+      <div class="batt-cap">Avance / calidad del dominio</div>
+      <div class="counts">
+        <div class="chip stw"><b>1</b><span>Stewards</span></div>
+        <div class="chip san"><b>1</b><span>Saneadores</span></div>
+        <div class="chip"><b>0</b><span>Firmaron</span></div>
+      </div>
+      <div class="people">
+    <div class="person" id="p-9-0">
+      <div class="p-head" onclick="togglePerson('p-9-0')">
+        <span class="role-badge rb-stw">Steward</span>
+        <div class="p-info">
+          <div class="p-name">Paola Andrea Benavides Echavarría</div>
+          <div class="p-cargo">Coordinador Centro de Contacto Experiencia</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:66%"></div></div>
+          <span class="gauge-val">66%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Alerta y Monitoreo.</b> Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Validación de Reglas.</b> Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Aprobación de Cambios.</b> Último filtro de negocio: aprueba a producción solo lo validado técnicamente.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Reporte y Gobernanza.</b> Reporta métricas mensuales de calidad al Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento y Protección.</b> Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div>
+    <div class="person" id="p-9-1">
+      <div class="p-head" onclick="togglePerson('p-9-1')">
+        <span class="role-badge rb-san">Saneador</span>
+        <div class="p-info">
+          <div class="p-name">Wilmar Arley Carmona García</div>
+          <div class="p-cargo">Auxiliar Call Center · Servicios</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:66%"></div></div>
+          <span class="gauge-val">66%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Intervención Técnica.</b> Ejecuta correcciones sobre registros incorrectos, vacíos o duplicados según reglas aprobadas.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Documentación Rigurosa.</b> Mantiene bitácora de cada cambio: fecha, regla, justificación, registros y autor.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Validación Temprana.</b> Prueba las correcciones en preproducción antes de moverlas a producción.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Trazabilidad y Auditoría.</b> Garantiza que toda intervención sea trazable y auditable.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento Normativo.</b> Respeta permisos de acceso y cumple Ley 1581 e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div></div>
+      <div class="card-foot">
+        
+    <div class="shared-block" id="sh-9">
+      <div class="shared-toggle" onclick="toggleShared('sh-9')">
+        <span>Responsabilidades compartidas (ambos roles)</span><span class="car">▾</span>
+      </div>
+      <div class="shared-list">
+    <div class="resp"><span class="n">·</span><span>Proteger la integridad y confidencialidad de los datos (Ley 1581 / ISO 27001).</span></div>
+    <div class="resp"><span class="n">·</span><span>Colaborar de forma activa y oportuna para resolver issues de calidad.</span></div>
+    <div class="resp"><span class="n">·</span><span>Participar en el seguimiento mensual del Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">·</span><span>Mantener actualizado el registro de cambios y alertas del dominio.</span></div></div>
+    </div>
+        <div class="ctx-block">
+          <div class="ctx-lbl">¿Por qué este %? · Contexto del dominio</div>
+          <p class="ctx-text">Se oficializó la estrategia de monetización del correo electrónico, pasando de correo@nocorreo a 13-cédula@comunidaddesconectada.com para habilitar datos desde la monetización. En tiendas se está gestionando el fortalecimiento del consentimiento de Habeas Data: actualmente el <b>70%</b> de los registros corresponde a No y el <b>30%</b> a Sí. Desde el 26 de marzo se ha logrado un incremento del <b>5%</b> en los registros con autorización <b>“Sí”</b>.</p>
+        </div>
+        
+      </div>
+    </article>
+    <article class="card">
+      <div class="c-head">
+        <span class="state-dot st-amber" id="dot-10"></span>
+        <div style="flex:1">
+          <div class="c-name">Consumidor y Experiencia</div>
+          <div class="c-meta" id="meta-10">2 persona(s) · 0/2 firmadas · En gestión</div>
+        </div>
+      </div>
+      <div class="battery">
+        <div class="batt-shell"><div class="batt-fill amber" id="bf-10" style="width:50%"></div></div>
+        <div class="batt-pct" id="pct-10">50%</div>
+      </div>
+      <div class="batt-cap">Avance / calidad del dominio</div>
+      <div class="counts">
+        <div class="chip stw"><b>2</b><span>Stewards</span></div>
+        <div class="chip san"><b>0</b><span>Saneadores</span></div>
+        <div class="chip"><b>0</b><span>Firmaron</span></div>
+      </div>
+      <div class="people">
+    <div class="person" id="p-10-0">
+      <div class="p-head" onclick="togglePerson('p-10-0')">
+        <span class="role-badge rb-stw">Steward</span>
+        <div class="p-info">
+          <div class="p-name">Margarita María Peláez Villada</div>
+          <div class="p-cargo">Jefe Experiencia y Conexión con el Consumidor</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:56%"></div></div>
+          <span class="gauge-val">56%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Alerta y Monitoreo.</b> Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Validación de Reglas.</b> Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Aprobación de Cambios.</b> Último filtro de negocio: aprueba a producción solo lo validado técnicamente.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Reporte y Gobernanza.</b> Reporta métricas mensuales de calidad al Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento y Protección.</b> Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div>
+    <div class="person" id="p-10-1">
+      <div class="p-head" onclick="togglePerson('p-10-1')">
+        <span class="role-badge rb-stw">Steward</span>
+        <div class="p-info">
+          <div class="p-name">Marcela Uribe Becerra</div>
+          <div class="p-cargo">Diseñadora Experiencia al Consumidor</div>
+        </div>
+        <span class="p-cont" title="Confirma continuidad">✔️</span>
+        <span class="p-sign sign-no">Pendiente</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:56%"></div></div>
+          <span class="gauge-val">56%</span>
+        </div>
+        <div class="resp-lbl">Responsabilidades del rol</div>
+    <div class="resp"><span class="n">1</span><span><b>Alerta y Monitoreo.</b> Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones.</span></div>
+    <div class="resp"><span class="n">2</span><span><b>Validación de Reglas.</b> Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección.</span></div>
+    <div class="resp"><span class="n">3</span><span><b>Aprobación de Cambios.</b> Último filtro de negocio: aprueba a producción solo lo validado técnicamente.</span></div>
+    <div class="resp"><span class="n">4</span><span><b>Reporte y Gobernanza.</b> Reporta métricas mensuales de calidad al Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">5</span><span><b>Cumplimiento y Protección.</b> Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001.</span></div>
+      </div></div>
+    </div></div>
+      <div class="card-foot">
+        
+    <div class="shared-block" id="sh-10">
+      <div class="shared-toggle" onclick="toggleShared('sh-10')">
+        <span>Responsabilidades compartidas (ambos roles)</span><span class="car">▾</span>
+      </div>
+      <div class="shared-list">
+    <div class="resp"><span class="n">·</span><span>Proteger la integridad y confidencialidad de los datos (Ley 1581 / ISO 27001).</span></div>
+    <div class="resp"><span class="n">·</span><span>Colaborar de forma activa y oportuna para resolver issues de calidad.</span></div>
+    <div class="resp"><span class="n">·</span><span>Participar en el seguimiento mensual del Comité de Gobierno del Dato.</span></div>
+    <div class="resp"><span class="n">·</span><span>Mantener actualizado el registro de cambios y alertas del dominio.</span></div></div>
+    </div>
+        <div class="ctx-block">
+          <div class="ctx-lbl">¿Por qué este %? · Contexto del dominio</div>
+          <p class="ctx-text">Corresponde a los líderes de categoría, quienes actualmente se encuentran liderando todo el proceso de consumidor y de experiencia y asignación de dominio y datos.</p>
+        </div>
+        
+      </div>
+    </article></section>
+
+  <footer>
+    <span>Tablero generado para el <span class="lime">Comité de Gobierno del Dato</span> · Industrias Haceb S.A.</span>
+    <span>Edición directa en el navegador · usa «Exportar HTML actualizado» para guardar y volver a publicar.</span>
+  </footer>
+</div>
+<div class="toast" id="toast">Datos exportados en JSON</div>
+
+<script id="data" type="application/json">[
+  {
+    "base": "Hogar Haceb",
+    "avance": 20,
+    "ctx": "Se encuentra pendiente un soporte relacionado con CDC que permita corregir la información de Habeas Data. A través de este sistema, el consentimiento de las personas que respondieron <b>“Sí”</b> fue registrado erróneamente como <b>“No”</b>, situación que debe ser ajustada mediante dicho soporte. Los demás temas de calidad, la saneadora hace cargues manuales.",
+    "personas": [
+      {
+        "n": "Santiago Marulanda Marín",
+        "c": "Analista Relacionamiento Consumidor Marca",
+        "rol": "steward",
+        "firma": false,
+        "continua": true
+      },
+      {
+        "n": "Lady Johanna Hernández Agudelo",
+        "c": "Asesor Apoyo Gestión Experiencia",
+        "rol": "saneador",
+        "firma": false,
+        "continua": true
+      }
+    ]
+  },
+  {
+    "base": "CRM (BigQuery)",
+    "avance": 58,
+    "ctx": "El indicador de calidad del dominio pasó del <b>54% al 58%</b>, gracias a la implementación de reglas básicas de calidad de datos en BigQuery y al fortalecimiento de los controles sobre la información.",
+    "personas": [
+      {
+        "n": "Melissa Giraldo Castro",
+        "c": "Analista de Ecosistemas Directos",
+        "rol": "steward",
+        "firma": false,
+        "continua": true
+      },
+      {
+        "n": "Luis Fernando Zapata",
+        "c": "Arquitecto de Aplicaciones y Datos",
+        "rol": "saneador",
+        "firma": false,
+        "continua": true
+      }
+    ]
+  },
+  {
+    "base": "Crédito Haceb",
+    "avance": 40,
+    "ctx": "La información oficial se encuentra en el CDC; sin embargo, actualmente se está tomando desde OnCredit mientras se integra la fuente al tablero de Datos Habilitados. Se trabaja con el Científico de Datos en esta incorporación y se cuenta con aproximadamente <b>83.000 registros</b> con control de Habeas Data (Sí/No).",
+    "personas": [
+      {
+        "n": "Nelcy Mestizo",
+        "c": "Líder Financiero Retail",
+        "rol": "steward",
+        "firma": false,
+        "continua": true
+      },
+      {
+        "n": "Manuel Zuleta",
+        "c": "Científico de Datos",
+        "rol": "saneador",
+        "firma": false,
+        "continua": true
+      },
+      {
+        "n": "Melissa Andrea Mena",
+        "c": "Administrador Crédito",
+        "rol": "saneador",
+        "firma": false,
+        "continua": true
+      }
+    ]
+  },
+  {
+    "base": "Clientes SAP",
+    "avance": 30,
+    "ctx": "Pendiente el bloqueo de transacciones con Carolina Morales. Se continúa trabajando en la calidad y gestión de la información del dominio.",
+    "personas": [
+      {
+        "n": "María Natalia Cuartas Escobar",
+        "c": "Coordinador Administrativo de Ventas",
+        "rol": "steward",
+        "firma": false,
+        "continua": true
+      },
+      {
+        "n": "Belquis Andrea Rúa",
+        "c": "Auxiliar Administrativo de Ventas",
+        "rol": "saneador",
+        "firma": false,
+        "continua": true
+      },
+      {
+        "n": "Tatiana Herrera",
+        "c": "Auxiliar Administrativo de Ventas",
+        "rol": "saneador",
+        "firma": false,
+        "continua": true
+      }
+    ]
+  },
+  {
+    "base": "ZPOS",
+    "avance": 16,
+    "ctx": "Avance correspondiente a la implementación de las reglas básicas de calidad de datos definidas para el dominio en BigQuery.",
+    "personas": [
+      {
+        "n": "Rubén Darío Montoya Tamayo",
+        "c": "Jefe Comercial Retail · Back Retail",
+        "rol": "steward",
+        "firma": false,
+        "continua": true
+      },
+      {
+        "n": "Andrea Catalina Colorado Marín",
+        "c": "Coordinador Retail",
+        "rol": "steward",
+        "firma": false,
+        "continua": true
+      },
+      {
+        "n": "Anyela Tatiana Quintero Ocampo",
+        "c": "Gestor Control Retail",
+        "rol": "steward",
+        "firma": false,
+        "continua": true
+      },
+      {
+        "n": "Carolina Morales",
+        "c": "Auxiliar Control Retail",
+        "rol": "saneador",
+        "firma": false,
+        "continua": true
+      }
+    ]
+  },
+  {
+    "base": "WhatsApp",
+    "avance": 50,
+    "ctx": "Información dinámica que requiere seguimiento y validación frecuente.",
+    "personas": [
+      {
+        "n": "Joseph Manuel Muñoz Galvis",
+        "c": "Auxiliar Escucha Gestión Experiencia",
+        "rol": "steward",
+        "firma": false,
+        "continua": true
+      }
+    ]
+  },
+  {
+    "base": "eCommerce y Haceb.com",
+    "avance": 40,
+    "ctx": "<b>Dominio controlado.</b> Se avanza en la depuración, validación y fortalecimiento de la calidad de la información del dominio. Está pendiente la depuración de aproximadamente <b>93.000 registros</b> de la base Aniversario Hogar, así como de otras bases activas e inactivas provenientes de VTEX, con el fin de consolidar y organizar la información. Adicionalmente, se trabaja con el equipo de Arquitectura para optimizar las integraciones y migrarlas a GCP.",
+    "personas": [
+      {
+        "n": "Carolina Rodas Posada",
+        "c": "Líder Ecommerce · Canales No Presenciales",
+        "rol": "steward",
+        "firma": false,
+        "continua": true
+      },
+      {
+        "n": "Carlos Alberto Narváez Beltrán",
+        "c": "Especialista TI Canales Digitales UEN's",
+        "rol": "steward",
+        "firma": false,
+        "continua": true
+      },
+      {
+        "n": "Vallentina Álvarez Paniagua",
+        "c": "Auxiliar Ecommerce Canales Digitales",
+        "rol": "saneador",
+        "firma": false,
+        "continua": true
+      }
+    ]
+  },
+  {
+    "base": "TI / TD",
+    "avance": 70,
+    "ctx": "Dominio de alto impacto transversal con múltiples fuentes de información y controles implementados.",
+    "personas": [
+      {
+        "n": "Diego Hernán Poveda Montenegro",
+        "c": "Científico de Datos · TD y TI",
+        "rol": "steward",
+        "firma": false,
+        "continua": true
+      },
+      {
+        "n": "Jorge Eliécer Mendoza Rodríguez",
+        "c": "Seguridad de la Información",
+        "rol": "steward",
+        "firma": false,
+        "continua": true
+      },
+      {
+        "n": "Juan Diego Castañeda Castañeda",
+        "c": "Ciberseguridad · TD y TI",
+        "rol": "steward",
+        "firma": false,
+        "continua": true
+      }
+    ]
+  },
+  {
+    "base": "Field Service",
+    "avance": 58,
+    "ctx": "Hace parte del dominio de CRM, por lo que comparte el mismo indicador de calidad de datos y las mismas reglas de calidad implementadas.",
+    "personas": [
+      {
+        "n": "Génesis Johana Tavera Nuño",
+        "c": "Coordinador Ingeniería de Servicio Back",
+        "rol": "steward",
+        "firma": false,
+        "continua": true
+      }
+    ]
+  },
+  {
+    "base": "Contact Center",
+    "avance": 60,
+    "ctx": "Se oficializó la estrategia de monetización del correo electrónico, pasando de correo@nocorreo a 13-cédula@comunidaddesconectada.com para habilitar datos desde la monetización. En tiendas se está gestionando el fortalecimiento del consentimiento de Habeas Data: actualmente el <b>70%</b> de los registros corresponde a No y el <b>30%</b> a Sí. Desde el 26 de marzo se ha logrado un incremento del <b>5%</b> en los registros con autorización <b>“Sí”</b>.",
+    "personas": [
+      {
+        "n": "Paola Andrea Benavides Echavarría",
+        "c": "Coordinador Centro de Contacto Experiencia",
+        "rol": "steward",
+        "firma": false,
+        "continua": true
+      },
+      {
+        "n": "Wilmar Arley Carmona García",
+        "c": "Auxiliar Call Center · Servicios",
+        "rol": "saneador",
+        "firma": false,
+        "continua": true
+      }
+    ]
+  },
+  {
+    "base": "Consumidor y Experiencia",
+    "avance": 50,
+    "ctx": "Corresponde a los líderes de categoría, quienes actualmente se encuentran liderando todo el proceso de consumidor y de experiencia y asignación de dominio y datos.",
+    "personas": [
+      {
+        "n": "Margarita María Peláez Villada",
+        "c": "Jefe Experiencia y Conexión con el Consumidor",
+        "rol": "steward",
+        "firma": false,
+        "continua": true
+      },
+      {
+        "n": "Marcela Uribe Becerra",
+        "c": "Diseñadora Experiencia al Consumidor",
+        "rol": "steward",
+        "firma": false,
+        "continua": true
+      }
+    ]
+  }
+]</script>
+
+<script>
+/* ============================================================
+   RESPONSABILIDADES POR ROL (tomadas del Acta de Reconocimiento)
+   ============================================================ */
+const RESP = {
+  steward:[
+    ["Alerta y Monitoreo","Monitorea la integridad de las reglas de negocio (tableros GCP) y alerta al Saneador ante vulneraciones."],
+    ["Validación de Reglas","Garantiza que las reglas reflejen la realidad operativa antes de cualquier corrección."],
+    ["Aprobación de Cambios","Último filtro de negocio: aprueba a producción solo lo validado técnicamente."],
+    ["Reporte y Gobernanza","Reporta métricas mensuales de calidad al Comité de Gobierno del Dato."],
+    ["Cumplimiento y Protección","Notifica novedades de habeas data (Ley 1581) e ISO/IEC 27001."]
+  ],
+  saneador:[
+    ["Intervención Técnica","Ejecuta correcciones sobre registros incorrectos, vacíos o duplicados según reglas aprobadas."],
+    ["Documentación Rigurosa","Mantiene bitácora de cada cambio: fecha, regla, justificación, registros y autor."],
+    ["Validación Temprana","Prueba las correcciones en preproducción antes de moverlas a producción."],
+    ["Trazabilidad y Auditoría","Garantiza que toda intervención sea trazable y auditable."],
+    ["Cumplimiento Normativo","Respeta permisos de acceso y cumple Ley 1581 e ISO/IEC 27001."]
+  ],
+  compartidas:[
+    "Proteger la integridad y confidencialidad de los datos (Ley 1581 / ISO 27001).",
+    "Colaborar de forma activa y oportuna para resolver issues de calidad.",
+    "Participar en el seguimiento mensual del Comité de Gobierno del Dato.",
+    "Mantener actualizado el registro de cambios y alertas del dominio."
+  ]
+};
+
+/* ============================================================
+   DATA — 26 personas agrupadas por base.
+   avance = % de gestión de firma de la base (definido por negocio).
+   firma:false = aún no firma el Acta · continua = confirma permanencia.
+   ============================================================ */
+let PLAZO = new Date("2026-07-16T23:59:59");
+
+const DEFAULT_BASES = JSON.parse(document.getElementById('data').textContent);
+let BASES = DEFAULT_BASES;
+
+/* ---- helpers ---- */
+const statusOf = p => p>=60 ? "ok" : p>=30 ? "amber" : "red";
+const statusTxt = {ok:"Avanzado", amber:"En gestión", red:"Crítico"};
+let editMode = false;
+
+const esc = s => String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const escAttr = s => String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+function personIndicator(person, baseAvance){
+  let v = baseAvance;
+  if(person.continua) v += 6; else v -= 8;
+  if(person.firma) v = 100;
+  return Math.max(0, Math.min(100, Math.round(v)));
+}
+
+/* ---- KPIs ---- */
+function buildKPIs(){
+  const all = BASES.flatMap(b=>b.personas);
+  const total = all.length || 1;
+  const stewards = all.filter(p=>p.rol==="steward").length;
+  const saneadores = all.filter(p=>p.rol==="saneador").length;
+  const firmados = all.filter(p=>p.firma).length;
+  const confirman = all.filter(p=>p.continua).length;
+  const sinFirmaBases = BASES.filter(b=>!b.personas.some(p=>p.firma)).length;
+  const avgAvance = BASES.length ? Math.round(BASES.reduce((s,b)=>s+(+b.avance||0),0)/BASES.length) : 0;
+  const firmaPct = Math.round(firmados/total*100);
+  const confPct = Math.round(confirman/total*100);
+  const items = [
+    {v:firmaPct+"%", k:"Firmas confirmadas del Acta", cls:"red", tag:"Meta 100%"},
+    {v:all.length, k:"Personas en el programa", cls:""},
+    {v:stewards, k:"Embajadores del Dato (Steward)", cls:"lime"},
+    {v:saneadores, k:"Saneadores Híbridos", cls:"gold"},
+    {v:BASES.length, k:"Bases de datos activas", cls:""},
+    {v:avgAvance+"%", k:"Avance promedio del dominio", cls:"gold"},
+    {v:sinFirmaBases, k:"Bases sin ninguna firma", cls:"red"},
+    {v:confPct+"%", k:"Confirman continuidad en el rol", cls:"lime"},
+  ];
+  document.getElementById("kpis").innerHTML = items.map(i=>`
+    <div class="kpi">
+      ${i.tag?`<span class="tag" style="background:rgba(209,74,58,.18);color:#f0a298;border:1px solid rgba(209,74,58,.4)">${i.tag}</span>`:""}
+      <div class="v ${i.cls}">${i.v}</div>
+      <div class="k">${i.k}</div>
+    </div>`).join("");
+  document.getElementById("basesCount").textContent = BASES.length + " bases";
+}
+
+/* ---- responsabilidades del rol (panel por persona) ---- */
+function respHTML(rol){
+  const list = RESP[rol].map((r,i)=>`
+    <div class="resp"><span class="n">${i+1}</span><span><b>${r[0]}.</b> ${r[1]}</span></div>`).join("");
+  return `<div class="resp-lbl">Responsabilidades del rol</div>${list}`;
+}
+function sharedHTML(bi){
+  const shared = RESP.compartidas.map(r=>`
+    <div class="resp"><span class="n">·</span><span>${r}</span></div>`).join("");
+  return `
+    <div class="shared-block" id="sh-${bi}">
+      <div class="shared-toggle" onclick="toggleShared('sh-${bi}')">
+        <span>Responsabilidades compartidas (ambos roles)</span><span class="car">▾</span>
+      </div>
+      <div class="shared-list">${shared}</div>
+    </div>`;
+}
+
+/* ---- render de una persona ---- */
+function personHTML(b, bi, p, pi){
+  if(editMode){
+    return `
+      <div class="person editing-person">
+        <div class="edit-row">
+          <select class="edit-sel" onchange="setP(${bi},${pi},'rol',this.value,true)">
+            <option value="steward" ${p.rol==="steward"?"selected":""}>Steward</option>
+            <option value="saneador" ${p.rol==="saneador"?"selected":""}>Saneador</option>
+          </select>
+          <button class="mini-btn del" onclick="delPerson(${bi},${pi})">🗑 Quitar persona</button>
+        </div>
+        <input class="edit-input" value="${escAttr(p.n)}" placeholder="Nombre completo"
+               oninput="setP(${bi},${pi},'n',this.value,false)">
+        <input class="edit-input" style="margin-top:6px" value="${escAttr(p.c)}" placeholder="Cargo / proceso"
+               oninput="setP(${bi},${pi},'c',this.value,false)">
+        <div class="edit-row">
+          <label><input type="checkbox" ${p.firma?"checked":""} onchange="setP(${bi},${pi},'firma',this.checked,true)"> Firmó el Acta</label>
+          <label><input type="checkbox" ${p.continua?"checked":""} onchange="setP(${bi},${pi},'continua',this.checked,true)"> Confirma continuidad</label>
+        </div>
+      </div>`;
+  }
+  const ind = personIndicator(p, +b.avance||0);
+  const rb = p.rol==="steward" ? ["rb-stw","Steward"] : ["rb-san","Saneador"];
+  const sg = p.firma ? ["sign-yes","Firmó"] : ["sign-no","Pendiente"];
+  const cont = p.continua ? "✔️" : "⚠️";
+  const contTitle = p.continua ? "Confirma continuidad" : "No ha confirmado continuidad";
+  return `
+    <div class="person" id="p-${bi}-${pi}">
+      <div class="p-head" onclick="togglePerson('p-${bi}-${pi}')">
+        <span class="role-badge ${rb[0]}">${rb[1]}</span>
+        <div class="p-info">
+          <div class="p-name">${esc(p.n)}</div>
+          <div class="p-cargo">${esc(p.c)}</div>
+        </div>
+        <span class="p-cont" title="${contTitle}">${cont}</span>
+        <span class="p-sign ${sg[0]}">${sg[1]}</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="p-body"><div class="p-body-inner">
+        <div class="p-gauge">
+          <div class="gauge-bar"><div class="gauge-fill" style="width:${ind}%"></div></div>
+          <span class="gauge-val">${ind}%</span>
+        </div>
+        ${respHTML(p.rol)}
+      </div></div>
+    </div>`;
+}
+
+/* ---- render de las tarjetas ---- */
+function buildGrid(){
+  let html = BASES.map((b,bi)=>{
+    const st = statusOf(+b.avance||0);
+    const stw = b.personas.filter(p=>p.rol==="steward").length;
+    const san = b.personas.filter(p=>p.rol==="saneador").length;
+    const firmados = b.personas.filter(p=>p.firma).length;
+    const people = b.personas.map((p,pi)=>personHTML(b,bi,p,pi)).join("");
+
+    const nameBlock = editMode
+      ? `<input class="edit-input c-name-edit" value="${escAttr(b.base)}" oninput="setBase(${bi},'base',this.value)">`
+      : `<div class="c-name">${esc(b.base)}</div>`;
+
+    const pctBlock = editMode
+      ? `<input class="edit-num" type="number" min="0" max="100" value="${+b.avance||0}" oninput="setAvance(${bi},this.value)">`
+      : `<div class="batt-pct" id="pct-${bi}">${+b.avance||0}%</div>`;
+
+    const ctxBlock = editMode
+      ? `<textarea class="edit-area" oninput="setBase(${bi},'ctx',this.value)">${esc(b.ctx)}</textarea>`
+      : `<p class="ctx-text${b.flag?' flag':''}">${b.ctx}</p>`;
+
+    const footActions = editMode
+      ? `<div class="foot-actions">
+           <button class="mini-btn add" onclick="addPerson(${bi})">＋ Agregar persona</button>
+           <button class="mini-btn del" onclick="delBase(${bi})">🗑 Eliminar base</button>
+         </div>`
+      : "";
+
+    return `
+    <article class="card">
+      <div class="c-head">
+        <span class="state-dot st-${st}" id="dot-${bi}"></span>
+        <div style="flex:1">
+          ${nameBlock}
+          <div class="c-meta" id="meta-${bi}">${b.personas.length} persona(s) · ${firmados}/${b.personas.length} firmadas · ${statusTxt[st]}</div>
+        </div>
+      </div>
+      <div class="battery">
+        <div class="batt-shell"><div class="batt-fill ${st==='red'?'red':st==='amber'?'amber':''}" id="bf-${bi}" style="width:${+b.avance||0}%"></div></div>
+        ${pctBlock}
+      </div>
+      <div class="batt-cap">Avance / calidad del dominio</div>
+      <div class="counts">
+        <div class="chip stw"><b>${stw}</b><span>Stewards</span></div>
+        <div class="chip san"><b>${san}</b><span>Saneadores</span></div>
+        <div class="chip"><b>${firmados}</b><span>Firmaron</span></div>
+      </div>
+      <div class="people">${people}</div>
+      <div class="card-foot">
+        ${sharedHTML(bi)}
+        <div class="ctx-block">
+          <div class="ctx-lbl">¿Por qué este %? · Contexto del dominio</div>
+          ${ctxBlock}
+        </div>
+        ${footActions}
+      </div>
+    </article>`;
+  }).join("");
+
+  if(editMode){
+    html += `<article class="card add-card" onclick="addBase()">＋ Agregar base de datos</article>`;
+  }
+  document.getElementById("grid").innerHTML = html;
+}
+
+function rebuild(){ buildKPIs(); buildGrid(); }
+function togglePerson(id){ const e=document.getElementById(id); if(e) e.classList.toggle("open"); }
+function toggleShared(id){ const e=document.getElementById(id); if(e) e.classList.toggle("open"); }
+
+/* ---- edición ---- */
+function setBase(bi,key,val){ BASES[bi][key]=val; }                 // texto: sin re-render (conserva foco)
+function setP(bi,pi,key,val,rerender){ BASES[bi].personas[pi][key]=val; if(rerender) rebuild(); }
+function setAvance(bi,val){
+  let v=Math.max(0,Math.min(100,parseInt(val,10)||0));
+  BASES[bi].avance=v;
+  const st=statusOf(v);
+  const bf=document.getElementById("bf-"+bi);
+  if(bf){ bf.style.width=v+"%"; bf.className="batt-fill "+(st==='red'?'red':st==='amber'?'amber':''); }
+  const dot=document.getElementById("dot-"+bi); if(dot) dot.className="state-dot st-"+st;
+  const meta=document.getElementById("meta-"+bi);
+  const b=BASES[bi]; const f=b.personas.filter(p=>p.firma).length;
+  if(meta) meta.textContent=`${b.personas.length} persona(s) · ${f}/${b.personas.length} firmadas · ${statusTxt[st]}`;
+  buildKPIs();
+}
+function addPerson(bi){ BASES[bi].personas.push({n:"Nuevo integrante",c:"Cargo / proceso",rol:"steward",firma:false,continua:true}); rebuild(); }
+function delPerson(bi,pi){ BASES[bi].personas.splice(pi,1); rebuild(); }
+function addBase(){ BASES.push({base:"Nueva base de datos",avance:0,ctx:"Describe aquí el contexto del avance.",personas:[]}); rebuild(); }
+function delBase(bi){ if(confirm("¿Eliminar la base \""+BASES[bi].base+"\" y todas sus personas?")){ BASES.splice(bi,1); rebuild(); } }
+
+function applyEditUI(){
+  document.body.classList.toggle("editing", editMode);
+  document.getElementById("btnEdit").innerHTML = editMode ? "✔️ Terminar y guardar" : "✏️ Editar tablero";
+  document.getElementById("editHint").innerHTML = editMode
+    ? "Modo edición activo · cambia %, contexto, nombres, cargos, rol y firmas. Al pulsar «Terminar y guardar» se guarda en la nube para todos."
+    : "Vista de solo lectura · pulsa «Editar tablero» para modificar cualquier campo. Los cambios se guardan en la nube.";
+}
+function toggleEdit(){
+  const saliendo = editMode;           // estaba editando y va a terminar
+  editMode = !editMode; applyEditUI(); rebuild();
+  if(saliendo) saveToServer();         // al terminar edición, persistir en el servidor
+}
+
+/* ---- persistencia en la nube (Vercel + Redis/Upstash) ---- */
+let SERVER_STATUS = "desconocido";   // "ok" | "local" | "sin_storage" | "no_api" | "red" | "desconocido"
+const IS_LOCAL = (location.protocol === "file:");   // abriendo el HTML directamente, sin servidor
+
+async function loadFromServer(){
+  if(IS_LOCAL){ SERVER_STATUS = "local"; return; }   // en local no hay /api: usa datos embebidos
+  try{
+    const r = await fetch('/api/data', { cache:'no-store' });
+    if(r.ok){
+      const j = await r.json();
+      SERVER_STATUS = "ok";
+      if(j && j.data && Array.isArray(j.data) && j.data.length){ BASES = j.data; }
+      return;
+    }
+    const j = await r.json().catch(()=>null);
+    if(j && j.error === "storage_not_configured"){ SERVER_STATUS = "sin_storage"; }
+    else if(r.status === 404){ SERVER_STATUS = "no_api"; }
+    else { SERVER_STATUS = "http_"+r.status; }
+    console.warn("[tablero] /api/data respondió", r.status, j);
+  }catch(e){
+    SERVER_STATUS = "red";
+    console.warn("[tablero] No se pudo contactar /api/data:", e && e.message);
+  }
+}
+
+async function saveToServer(){
+  if(IS_LOCAL){
+    toast("Estás en local: el guardado en la nube funciona al desplegar. Usa «Exportar HTML/JSON» para guardar ahora.");
+    return false;
+  }
+  try{
+    toast("Guardando cambios…");
+    const r = await fetch('/api/data', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      cache:'no-store',
+      body: JSON.stringify({ data: BASES })
+    });
+    if(r.ok){ SERVER_STATUS="ok"; toast("Cambios guardados en la nube ✓"); return true; }
+    const j = await r.json().catch(()=>({}));
+    if(j.error === "storage_not_configured"){
+      SERVER_STATUS="sin_storage";
+      toast("Falta conectar la base de datos (Storage → Upstash) y redeployar");
+    } else if(r.status === 404){
+      SERVER_STATUS="no_api";
+      toast("No se encontró /api/data: falta subir la carpeta /api y redeployar");
+    } else {
+      toast("No se pudo guardar (HTTP "+r.status+"). Revisa los logs en Vercel");
+    }
+    console.error("[tablero] Guardado falló:", r.status, j);
+    return false;
+  }catch(e){
+    SERVER_STATUS="red";
+    toast("No se pudo contactar /api/data — desactiva la Protección de Despliegue o usa la URL de producción");
+    console.error("[tablero] fetch POST /api/data falló:", e);
+    return false;
+  }
+}
+
+// Aviso temprano según el entorno.
+function avisarEstadoServidor(){
+  if(SERVER_STATUS === "local"){
+    setTimeout(()=>toast("Modo local (vista previa) · el guardado en la nube se activa al desplegar en Vercel"), 900);
+    return;
+  }
+  if(SERVER_STATUS === "ok" || SERVER_STATUS === "desconocido") return;
+  const msg = {
+    sin_storage: "Conecta la base de datos en Vercel (Storage → Upstash) y redeploya para guardar.",
+    no_api: "La función /api no está desplegada: sube la carpeta /api y redeploya.",
+    red: "No hay conexión con /api/data (protección de despliegue activa o URL de preview)."
+  }[SERVER_STATUS] || ("El servidor de datos respondió con error ("+SERVER_STATUS+").");
+  setTimeout(()=>toast(msg), 900);
+}
+
+/* ---- exportación ---- */
+function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2600); }
+function download(name,text,mime){
+  const blob=new Blob([text],{type:mime}); const url=URL.createObjectURL(blob);
+  const a=document.createElement("a"); a.href=url; a.download=name; document.body.appendChild(a); a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},200);
+}
+function exportJSON(){
+  download("datos-gobierno-dato-haceb.json", JSON.stringify(BASES,null,2), "application/json");
+  toast("Datos exportados en JSON");
+}
+function exportHTML(){
+  const data = JSON.stringify(BASES,null,2).replace(/<\/script>/gi,"<\\/script>");
+  document.getElementById("data").textContent = data;
+  const wasEdit = editMode;
+  document.body.classList.remove("editing");                 // exportar siempre en vista limpia
+  const html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+  if(wasEdit) document.body.classList.add("editing");
+  download("tablero-gobierno-dato-haceb.html", html, "text/html");
+  toast("HTML actualizado descargado · súbelo a SharePoint para publicar");
+}
+
+/* ---- countdown ---- */
+function tick(){
+  const now=new Date(); let diff=Math.max(0,PLAZO-now);
+  const d=Math.floor(diff/86400000); diff-=d*86400000;
+  const h=Math.floor(diff/3600000); diff-=h*3600000;
+  const m=Math.floor(diff/60000); diff-=m*60000;
+  const s=Math.floor(diff/1000);
+  const pad=n=>String(n).padStart(2,"0");
+  document.getElementById("dd").textContent=d;
+  document.getElementById("hh").textContent=pad(h);
+  document.getElementById("mm").textContent=pad(m);
+  document.getElementById("ss").textContent=pad(s);
+}
+
+async function boot(){
+  await loadFromServer();      // intenta traer los datos guardados; si no, usa los embebidos
+  applyEditUI(); buildKPIs(); buildGrid(); tick(); setInterval(tick,1000);
+  avisarEstadoServidor();      // si el backend no respondió, lo indica claramente
+}
+boot();
+</script>
+
+
+</body></html>
